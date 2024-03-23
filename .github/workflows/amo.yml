@@ -1,0 +1,28 @@
+name: Publish to AMO
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Zip the extension
+      run: zip -r cutefasti_url_shortener-autobuild${{ github.run_number }}.zip .
+
+    - name: Upload to AMO
+      uses: birchill/amo-upload@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        addon_id: cute-fasti-url-shortener
+        amo_jwt_iss: ${{ secrets.AMO_JWT_ISS }}
+        amo_jwt_secret: ${{ secrets.AMO_JWT_SECRET }}
+        addon_file: cutefasti_url_shortener-autobuild${{ github.run_number }}.zip
+        release_notes: 'Automated release from GitHub Actions workflow. Version: ${{ github.run_number }}.'
