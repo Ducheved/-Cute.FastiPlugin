@@ -13,30 +13,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
-
-    - name: Install dependencies
-      run: npm ci
+    - name: Install web-ext  
+      run: npm install --global web-ext
 
     - name: Build extension
-      run: npm run build
+      run: web-ext build --source-dir ./ --artifacts-dir build
 
-    - name: Zip the extension
+    - name: Zip the extension 
       run: zip -r cutefasti_url_shortener-autobuild${{ github.run_number }}.zip .
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: extension
-        path: dist/*.xpi
+        path: build/*.xpi  
 
-    - name: Create GitHub Release 
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/*.xpi
+        files: build/*.xpi
 
     - name: Upload to AMO
       uses: birchill/amo-upload@v1.0.0
