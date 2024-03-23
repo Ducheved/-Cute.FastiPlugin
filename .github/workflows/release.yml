@@ -1,0 +1,76 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# Portions Copyright (C) Philipp Kewisch, 2019
+---
+    name: "Release"
+    on:
+      push:
+        tags:
+          - 'v*.*.*'
+    
+    jobs:
+      lint:
+        name: "Lint"
+        runs-on: ubuntu-latest
+        steps:
+          - name: "Checkout"
+            uses: actions/checkout@v1
+    
+        #   - name: "Install ESlint"
+        #     run: npm install eslint
+    
+        #   - name: "Run ESLint"
+        #     uses: gimenete/eslint-action@1.0
+        #     env:
+        #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+          - name: "web-ext lint"
+            uses: kewisch/action-web-ext@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              cmd: lint
+              source: src
+              channel: listed
+    
+      sign:
+        name: "Release"
+        runs-on: ubuntu-latest
+        needs: lint
+        steps:
+          - name: "Checkout"
+            uses: actions/checkout@v1
+    
+          - name: "web-ext build"
+            id: "web-ext-build"
+            uses: kewisch/action-web-ext@v1
+            with:
+              cmd: build
+              source: src
+    
+          - name: "web-ext sign"
+            id: "web-ext-sign"
+            uses: kewisch/action-web-ext@v1
+            with:
+              cmd: sign
+              source: ${{ steps.web-ext-build.outputs.target }}
+              channel: listed
+              verbose: true
+              apiKey: ${{ secrets.AMO_JWT_ISS }}
+              apiSecret: ${{ secrets.AMO_JWT_SECRET }}
+    
+          - name: "Rename Artifact"
+            run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/amoqueue.unsigned.xpi
+    
+          - name: "Generate Changelog"
+            run: npx conventional-changelog -p angular -r 2 | tail -n +3 | tee web-ext-artifacts/CHANGELOG.md
+    
+          - name: "Create Release"
+            uses: softprops/action-gh-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              files: web-ext-artifacts/amoqueue.unsigned.xpi
+              body_path: web-ext-artifacts/CHANGELOG.md
+    
