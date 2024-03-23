@@ -17,14 +17,6 @@
           - name: "Checkout"
             uses: actions/checkout@v1
     
-        #   - name: "Install ESlint"
-        #     run: npm install eslint
-    
-        #   - name: "Run ESLint"
-        #     uses: gimenete/eslint-action@1.0
-        #     env:
-        #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
           - name: "web-ext lint"
             uses: kewisch/action-web-ext@v1
             env:
@@ -61,7 +53,7 @@
               apiSecret: ${{ secrets.AMO_JWT_SECRET }}
     
           - name: "Rename Artifact"
-            run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/amoqueue.unsigned.xpi
+            run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/cute-fasti-url-shortener.unsigned.xpi
     
           - name: "Generate Changelog"
             run: npx conventional-changelog -p angular -r 2 | tail -n +3 | tee web-ext-artifacts/CHANGELOG.md
@@ -71,6 +63,6 @@
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             with:
-              files: web-ext-artifacts/amoqueue.unsigned.xpi
+              files: web-ext-artifacts/cute-fasti-url-shortener.unsigned.xpi
               body_path: web-ext-artifacts/CHANGELOG.md
     

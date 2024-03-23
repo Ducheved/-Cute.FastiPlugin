@@ -43,11 +43,11 @@
               source: src
     
           - name: "Rename Artifact"
-            run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/amoqueue.xpi
+            run: mv ${{ steps.web-ext-build.outputs.target }} web-ext-artifacts/cute-fasti-url-shortener.xpi
     
           - name: "Upload Artifact"
             uses: actions/upload-artifact@master
             with:
-              name: amoqueue.xpi
-              path: web-ext-artifacts/amoqueue.xpi
+              name: cute-fasti-url-shortener.xpi
+              path: web-ext-artifacts/cute-fasti-url-shortener.xpi
     
