@@ -13,25 +13,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install web-ext  
-      run: npm install --global web-ext
-
-    - name: Build extension
-      run: web-ext build --source-dir ./ --artifacts-dir build
-
-    - name: Zip the extension 
-      run: zip -r cutefasti_url_shortener-autobuild${{ github.run_number }}.zip .
+    - name: Zip and rename extension
+      run: |
+        zip -r cutefasti_url_shortener.zip .
+        mv cutefasti_url_shortener.zip cutefasti_url_shortener.xpi
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: extension
-        path: build/*.xpi  
+        path: cutefasti_url_shortener.xpi
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: build/*.xpi
+        files: cutefasti_url_shortener.xpi
 
     - name: Upload to AMO
       uses: birchill/amo-upload@v1.0.0
@@ -41,5 +37,5 @@ jobs:
         addon_id: cute-fasti-url-shortener
         amo_jwt_iss: ${{ secrets.AMO_JWT_ISS }}
         amo_jwt_secret: ${{ secrets.AMO_JWT_SECRET }}
-        addon_file: cutefasti_url_shortener-autobuild${{ github.run_number }}.zip
+        addon_file: cutefasti_url_shortener.xpi
         release_notes: 'Automated release from GitHub Actions workflow. Version: ${{ github.run_number }}.'
