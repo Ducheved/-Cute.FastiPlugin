@@ -1,4 +1,4 @@
-name: Publish to AMO and Create GitHub Release
+name: Publish to AMO
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
       - main
 
 jobs:
-
   publish:
     runs-on: ubuntu-latest
 
@@ -16,6 +15,21 @@ jobs:
 
     - name: Zip the extension
       run: zip -r cutefasti_url_shortener-autobuild${{ github.run_number }}.zip .
+
+    - name: Create distr branch if not exists
+      run: |
+        git checkout distr || git checkout -b distr
+
+    - name: Move zip file to distr branch
+      run: mv cutefasti_url_shortener-autobuild${{ github.run_number }}.zip ./distr/
+
+    - name: Commit and push
+      uses: EndBug/add-and-commit@v7
+      with:
+        author_name: GitHub Actions
+        author_email: actions@github.com
+        message: 'Add new zip file'
+        add: 'distr/cutefasti_url_shortener-autobuild${{ github.run_number }}.zip'
 
     - name: Upload to AMO
       uses: birchill/amo-upload@v1.0.0
@@ -27,25 +41,3 @@ jobs:
         amo_jwt_secret: ${{ secrets.AMO_JWT_SECRET }}
         addon_file: cutefasti_url_shortener-autobuild${{ github.run_number }}.zip
         release_notes: 'Automated release from GitHub Actions workflow. Version: ${{ github.run_number }}.'
-
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
-        body: Automated release from GitHub Actions workflow.
-  
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./cutefasti_url_shortener-autobuild${{ github.run_number }}.zip
-        asset_name: cutefasti_url_shortener-autobuild${{ github.run_number }}.zip
-        asset_content_type: application/zip
