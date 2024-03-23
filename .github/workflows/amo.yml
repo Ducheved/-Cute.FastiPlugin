@@ -24,10 +24,26 @@ jobs:
         name: extension
         path: cutefasti_url_shortener.xpi
 
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
+
+    - name: Create tag
+      uses: anothrNick/github-tag-action@1.35.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: ''
+        WITH_V: true
+        RELEASE_BRANCHES: main
+        TAG_CONTEXT: 'github-actions'
+      with:
+        tag_name: v${{ steps.date.outputs.date }}
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: cutefasti_url_shortener.xpi
+        tag_name: v${{ steps.date.outputs.date }}
 
     - name: Upload to AMO
       uses: birchill/amo-upload@v1.0.0
