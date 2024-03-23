@@ -32,10 +32,9 @@ jobs:
       uses: anothrNick/github-tag-action@1.35.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DEFAULT_BUMP: ''
+        DEFAULT_BUMP: manual
         WITH_V: true
         RELEASE_BRANCHES: main
-        TAG_CONTEXT: 'github-actions'
       with:
         tag_name: v${{ steps.date.outputs.date }}
 
