@@ -1,1 +1,1 @@
-# -Cute.FastiPlugin
+# Cute.FastiPlugin
