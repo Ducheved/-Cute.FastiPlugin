@@ -8,7 +8,7 @@ async function shortenUrl(url) {
   const requestBody = {
     urls: [url],
     command: 'short',
-    expiration: 262800,
+    expiration: 15768000,
     maxClicks: '0',
     customPrefix: 'ff',
     hashLength: 8
